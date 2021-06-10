@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/DanielleMStevens/permissR.svg?branch=main)](https://travis-ci.com/DanielleMStevens/permissR)
+
 # permissR - an R Package for finding Bacterial Permissive Sites
 
 Danielle M. Stevens<sup>1,2</sup> and Gitta Coaker<sup>1</sup>.
