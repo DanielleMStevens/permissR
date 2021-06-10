@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/DanielleMStevens/permissR.svg?branch=main)](https://travis-ci.com/DanielleMStevens/permissR) CODECOV_TOKEN='31f02fd2-6119-47d2-89a1-a290dc0e7520
+[![Build Status](https://travis-ci.com/DanielleMStevens/permissR.svg?branch=main)](https://travis-ci.com/DanielleMStevens/permissR) 
 
 # permissR - an R Package for finding Bacterial Permissive Sites
 
