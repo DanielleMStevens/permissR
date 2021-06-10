@@ -39,8 +39,6 @@ conda install isescan
 
 ### To run it on the terminal follow below:
 ```
-conda install isescan 
-
 # run the following command, update the number of threads based on your computer
 
 isescan.py /path/to/fasta_file.fasta proteome hmm --nthread 6
@@ -63,7 +61,7 @@ system('which python')
 #/home/danimstevens/anaconda3/bin/python
 ```
 
-Find-regions.R will ask the user if you want to run ISEScacn on the genome selected and will run it, but this will only work if the above steps are caried out.
+permissR will ask the user if you want to run ISEScacn on the genome selected and will run it, but this will only work if the above steps are caried out.
 
 ## 3. Run permissR on the R-console
 
