@@ -19,7 +19,8 @@ Imports:
 	DescTools (>= 0.99.40),
 	patchwork (>= 1.1.1),
 	rstudioapi (>= 0.13),
-	parallel (>= 4.0.4)
+	parallel (>= 4.0.4),
+	extrafont
 LazyData: true
 BugReports: https://github.com/DanielleMStevens/permissR/issues
 Date: 2021-06-09

@@ -16,23 +16,16 @@ Mainly it tries to indentify sites which are at least 1.5 kB in length (for rela
 
 
 
-## 1. Install Github repository
+## 1. Install Package
 
-To install the github repositiory, type the following code into your terminal:
+To install, type the following code into your R console:
 
 
 ```
-git clone https://github.com/DanielleMStevens/permissR
+devtools::install_github("DanielleMStevens/permissR")
 ```
 
-
-##  2. Install package dependencies on the R-console
-
-```
-source("./Package-dependencies.R")
-```
-
-## 3. Install and run ISEScan
+## 2. Install and run ISEScan
 
 ISEScan can be installed easily with conda. For info on how to intall conda, [see this Github repo](https://github.com/DanielleMStevens/ROS_production_review/blob/master/process_files.md). We can then run it in one of two ways: 1) on the terminal directly or 2) on the terminal through the R-console. 
 
@@ -70,12 +63,19 @@ system('which python')
 #/home/danimstevens/anaconda3/bin/python
 ```
 
-Find-regions.R will ask you if you want to run ISEScacn on the genome selected and will run it for you, but this will only work if the above steps are caried out.
+Find-regions.R will ask the user if you want to run ISEScacn on the genome selected and will run it, but this will only work if the above steps are caried out.
 
-## 4. Run Find-regions.R on the R-console
+## 3. Run permissR on the R-console
+
+If the user wants to run the function similar as one would on the command line, the user can feed permissR the path (relative or absolute is fine) of each file such that it looks like the following:
 
 ```
-source("./Find-regions.R")
+permmissR::permissR("/path/to/genbank/file.gbff", "/path/to/fasta/file.fasta")
+```
+
+Or if the user wants, the user can run the function with no arguments and a GUI interface will appear, letting the user select each file which is required to run.
+```
+permissR::permissR()
 
 # The console will alert the user to select the files to analyze. 
 # This will include a fasta file of the DNA contigs, a genbank (.gbff) file, 
@@ -95,8 +95,6 @@ In addition: There were 50 or more warnings (use warnings() to see the first 50)
 ```
 This essentially means you fonts are not properly loaded. To fix this, run the following code:
 ```
-install.packages('extrafont')
-library(extrafont)
 extrafont::font_import()
 
 or
