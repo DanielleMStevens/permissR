@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.com/DanielleMStevens/permissR.svg?branch=main)](https://travis-ci.com/DanielleMStevens/permissR) 
+<img align="right" width="75" height="75" src="http://www.fillmurray.com/100/100">
 
 # permissR - an R Package for finding Bacterial Permissive Sites
 
@@ -14,7 +15,7 @@ This package works intandom with pSelAct Express, a vector modified for gene exp
 
 Mainly it tries to indentify sites which are at least 1.5 kB in length (for relatively easy, specific recombination) that contain no protein encoding genes, no mobile elements which may trigger structural changes, and are ranked by complexity to make cloning a little easier (i.e. reasonable GC-content). The outputs of this pipeline include one folder of figures which inlcudes an asessment of the overall genome, a second folder which contains figures for regions of interest, tab-delimited text file with the ranked list of sites, and finally a tab-delimited file of any sites which share some degree of homology with the predicted site. This pipeline was designed for bacteria and in its current state, not recommended on eurkaryotes.
 
-![](./permissR_figure.png)
+![](/github_images/permissR_figure.png)
 
 
 
