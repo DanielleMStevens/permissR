@@ -8,11 +8,6 @@
 #           plots for main hits as well as tab-delimited file output of major hit regions ranked by complexity
 #-----------------------------------------------------------------------------------------------
 
-
-######################################################################
-# main function to run and control script
-######################################################################
-
 #' Load GBFF/GBK and FASTA file
 #'
 #' This function loads both a DNA contig fasta file and annotation genbank file
@@ -23,6 +18,8 @@
 #' @param infile Path to the input file
 #' @return Plots and files of potential permissive sites in a provided bacterial genome
 #' @export
+#' 
+#' 
 permissR <- function(genbank_file_path, fasta_file_path){
 
 ######################################################################

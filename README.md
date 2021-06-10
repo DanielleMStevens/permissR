@@ -29,6 +29,12 @@ devtools::install_github("DanielleMStevens/permissR")
 
 ISEScan can be installed easily with conda. For info on how to intall conda, [see this Github repo](https://github.com/DanielleMStevens/ROS_production_review/blob/master/process_files.md). We can then run it in one of two ways: 1) on the terminal directly or 2) on the terminal through the R-console. 
 
+On the terminal, you'll still need to use conda to install isescan. 
+```shell
+conda install isescan
+```
+
+
 ### To run it on the terminal follow below:
 ```
 conda install isescan 
@@ -39,11 +45,6 @@ isescan.py /path/to/fasta_file.fasta proteome hmm --nthread 6
 ```
 
 ### If you want to run ISEScan while in R (i.e. the script will input the commands for you), you'll need to run the following commands:
-
-On the terminal, you'll still need to use conda to install isescan. 
-```shell
-conda install isescan
-```
 
 The on the R-console:
 ```R

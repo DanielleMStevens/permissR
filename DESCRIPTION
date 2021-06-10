@@ -10,6 +10,7 @@ Authors@R:
 Maintainer: Danielle Stevens <dmstev@ucdavis.com>
 Description: An R package for finding permissive sites in bacterial genomes to use inconjuction with the plasmid, pSelAct-Express, for integrative chromosomal expression.
 License: MIT + file LICENSE
+biocViews:
 Imports:
 	BiocManager (>= 1.30.10),
 	genbankr (>= 1.18.0),
