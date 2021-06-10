@@ -47,9 +47,6 @@ conda install isescan
 
 The on the R-console:
 ```R
-install.packages('devtools')
-library(devtools)
-
 usethis::edit_r_profile()
 
 # edit path to conda version of python. Anaconda should be located in your home or user directory.
