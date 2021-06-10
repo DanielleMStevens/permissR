@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.com/DanielleMStevens/permissR.svg?branch=main)](https://travis-ci.com/DanielleMStevens/permissR) 
-<img align="right" width="75" height="75" src="https://github.com/DanielleMStevens/permissR/blob/main/github_images/permissR_logo.png">
+<img align="right" width="125" height="150" src="https://github.com/DanielleMStevens/permissR/blob/main/github_images/permissR_logo.png">
 
 # permissR - an R Package for finding Bacterial Permissive Sites
 
