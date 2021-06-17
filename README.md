@@ -1,6 +1,5 @@
 [![Build Status](https://travis-ci.com/DanielleMStevens/permissR.svg?branch=main)](https://travis-ci.com/DanielleMStevens/permissR) 
 <img align="right" width="140" height="150" src="https://github.com/DanielleMStevens/permissR/blob/main/github_images/permissR_logo.png">
-
 # permissR - an R Package for finding Bacterial Permissive Sites
 
 Danielle M. Stevens<sup>1,2</sup> and Gitta Coaker<sup>1</sup>.
@@ -13,7 +12,7 @@ permissR is an R script for finding permissive sites, i.e. sites which appear to
 
 This package works intandom with pSelAct Express, a vector modified for gene expression in the chromosome of a permissive site. Therefore, the decisions to find such sites are ranked for this purpose.
 
-Mainly it tries to indentify sites which are at least 1.5 kB in length (for relatively easy, specific recombination) that contain no protein encoding genes, no mobile elements which may trigger structural changes, and are ranked by complexity to make cloning a little easier (i.e. reasonable GC-content). The outputs of this pipeline include one folder of figures which inlcudes an asessment of the overall genome, a second folder which contains figures for regions of interest, tab-delimited text file with the ranked list of sites, and finally a tab-delimited file of any sites which share some degree of homology with the predicted site. This pipeline was designed for bacteria and in its current state, not recommended on eurkaryotes.
+permissR tries to identify sites which are at least 1.5 kB in length (for relatively easy, specific recombination), that contain no protein encoding genes, no mobile elements which may trigger structural changes, and are ranked by complexity to make cloning a little easier (i.e. reasonable GC-content). The outputs of this pipeline include one folder of figures which inlcudes an asessment of the overall genome, figures for regions of interest, tab-delimited text file with the ranked list of sites, and finally a tab-delimited file of any sites which share some degree of homology with the predicted site (this is only procurred if there are any). This pipeline was designed for bacteria and in its current state, not recommended on eurkaryotes.
 
 ![](/github_images/permissR_figure.png)
 
@@ -25,6 +24,7 @@ To install, type the following code into your R console:
 
 
 ```
+install.packages("devtools")
 devtools::install_github("DanielleMStevens/permissR")
 ```
 
@@ -42,7 +42,7 @@ conda install isescan
 ```
 # run the following command, update the number of threads based on your computer
 
-isescan.py /path/to/fasta_file.fasta proteome hmm --nthread 6
+isescan.py --seqfile /path/to/fasta_file.fasta --output fasta_file --nthread 6
 ```
 
 ### If you want to run ISEScan while in R (i.e. the script will input the commands for you), you'll need to run the following commands:
@@ -66,13 +66,13 @@ permissR will ask the user if you want to run ISEScacn on the genome selected an
 
 ## 3. Run permissR on the R-console
 
-If the user wants to run the function similar as one would on the command line, the user can feed permissR the path (relative or absolute is fine) of each file such that it looks like the following:
+If the user wants to run the function similar as one would on the command line, you can feed permissR the path (relative or absolute is fine) of each file such that it looks like the following:
 
 ```
 permmissR::permissR("/path/to/genbank/file.gbff", "/path/to/fasta/file.fasta")
 ```
 
-Or if the user wants, the user can run the function with no arguments and a GUI interface will appear, letting the user select each file which is required to run.
+Or you can run the function with no arguments and a GUI interface will appear, letting the user select each file which is required to run.
 ```
 permissR::permissR()
 

@@ -25,10 +25,12 @@
   
   if (check_IS_Scan == "y"){
     number_of_cores <- parallel::detectCores()/2
-    update_file_name <- gsub(getwd(), "", fasta_file)
-    update_file_name <- paste(".",update_file_name, sep = "")
+    update_file_name <- gsub(dirname(fasta_file), "", fasta_file)
+    update_file_name <- gsub("/","",update_file_name)
+    update_file_name <- gsub(".fasta","",update_file_name)
+
     
-    system(paste('isescan.py', update_file_name, 'proteome hmm --nthread', number_of_cores, sep = ' '))
+    system(paste('isescan.py --seqfile', fasta_file, '--output', update_file_name, '--nthread', number_of_cores, sep = ' '))
   }
   
   
