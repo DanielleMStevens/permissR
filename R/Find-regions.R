@@ -117,7 +117,64 @@ permissR <- function(genbank_file_path, fasta_file_path){
                                        'type' = character(0), 'strand' = character(0), 
                                        'start' = numeric(0), 'end' = numeric(0))
     
-    anno_file_reformate <- .reformate_genbank()
+    
+    
+    
+    
+    reformate_genbank <- function(file_in){
+      for (i in 1:nrow(file_in$FEATURES)){
+      
+        
+        # skip empty annotations 
+        if(length(file_in$FEATURES[[i]]) == 0){
+          next
+        }
+        
+        # process lines with annotation info
+        if(length(file_in$FEATURES[[i]]) != 0){
+          if(any(grepl("organism", colnames(file_in$FEATURES[[i]]))) == TRUE){
+            next
+          }
+
+          if(file_in$FEATURES[[i]]$type == "CDS"){
+            gene_name <- file_in$FEATURES[[i]]$locus_tag
+            locus_tag <- file_in$FEATURES[[i]]$locus_tag
+          }
+          if(file_in$FEATURES[[i]]$type == "gene"){
+            gene_name <- file_in$FEATURES[[i]]$locus_tag
+            locus_tag <- file_in$FEATURES[[i]]$locus_tag
+          }
+          if(file_in$FEATURES[[i]]$type == "regulatory"){
+            gene_name <- file_in$FEATURES[[i]]$regulatory_class
+            locus_tag <- file_in$FEATURES[[i]]$db_xref
+          }
+        }
+
+        
+        temp_df <- data.frame("gene" = gene_name, 
+                              "locus-tag" = locus_tag,
+                              'type' = file_in$FEATURES[[i]]$type,
+                              'strand' = file_in$FEATURES[[i]]$strand,
+                              'start' = file_in$FEATURES[[i]]$start,
+                              'end' = file_in$FEATURES[[i]]$end)
+        
+        #print(paste(i,temp_df))  
+        anno_file_reformate <- rbind(anno_file_reformate, temp_df)
+  
+      }
+      
+      anno_file_reformate <- anno_file_reformate %>% dplyr::distinct(gene, start, end, .keep_all = TRUE)
+      return(anno_file_reformate)
+      
+    }
+    
+    
+    anno_file_reformate <- reformate_genbank(annotation_file)
+
+
+
+    
+
 
     
   ######################################################################
@@ -153,8 +210,8 @@ permissR <- function(genbank_file_path, fasta_file_path){
     
     cat("-------------------------------------------------\n")
     cat("Calculating distance Between Protein-coding Genes...\n")
-    dist_between_genes <- data.frame("contig" = character(0), "gene-1" = character(0), "gene-2" = character(0), 
-                                     "position-1" = numeric(0), "position-2" = numeric(0), "distance" = numeric(0))
+    dist_between_genes <- data.frame("contig" = character(0), "gene_1" = character(0), "gene_2" = character(0), 
+                                     "position_1" = numeric(0), "position_2" = numeric(0), "distance" = numeric(0))
     
     
     for (i in 1:nrow(anno_file_reformate)){
@@ -164,10 +221,10 @@ permissR <- function(genbank_file_path, fasta_file_path){
         }
           distance_between_genes <- anno_file_reformate[i+1,6] - anno_file_reformate[i,7]
           temp_df <- data.frame("contig" = anno_file_reformate[i,1],
-                                "gene-1" = anno_file_reformate[i,2],
-                                "gene-2" = anno_file_reformate[i+1,2],
-                                "position-1" = anno_file_reformate[i,7],
-                                "position-2" = anno_file_reformate[i+1,6],
+                                "gene_1" = anno_file_reformate[i,2],
+                                "gene_2" = anno_file_reformate[i+1,2],
+                                "position_1" = anno_file_reformate[i,7],
+                                "position_2" = anno_file_reformate[i+1,6],
                                 "distance" = distance_between_genes)
           dist_between_genes <- rbind(dist_between_genes, temp_df)
       }
@@ -199,12 +256,16 @@ permissR <- function(genbank_file_path, fasta_file_path){
       names(whole_genome)[i] <- paste("Contig", i, sep = "_")
     }
   
-  
+    
+    # Creates two empty columns 
     cat("Pulling out sequence of site and calculating GC content...\n")
-    seq_between_genes <- data.frame(dist_between_genes, "overall-gc-content" = numeric(nrow(dist_between_genes)), 
+    seq_between_genes <- data.frame(dist_between_genes, 
+                                    "overall_gc_content" = numeric(nrow(dist_between_genes)), 
                                     "sequence" = character(nrow(dist_between_genes)))
     
     seq_between_genes$sequence <- as.character(seq_between_genes$sequence)
+    
+    
     
     for (i in 1:nrow(seq_between_genes)){
       #temp fix until I figure out how to better filter out plasmids
@@ -212,18 +273,18 @@ permissR <- function(genbank_file_path, fasta_file_path){
         next
       }
       if ((any(names(whole_genome) %in% dist_between_genes[i,1])) == TRUE){
-      which_contig <- whole_genome[names(whole_genome) %in% dist_between_genes[i,1]]
-      seq_between_genes[i,7] <- seqinr::GC(which_contig[[1]][dist_between_genes$position.1[i]:dist_between_genes$position.2[i]])
-      pull_sequence <- as.character(paste(which_contig[[1]][dist_between_genes$position.1[i]:dist_between_genes$position.2[i]], collapse = ""))
-      seq_between_genes[i,8] <- as.character(pull_sequence)
+        which_contig <- whole_genome[names(whole_genome) %in% dist_between_genes[i,1]]
+        seq_between_genes[i,7] <- seqinr::GC(which_contig[[1]][dist_between_genes$position_1[i]:dist_between_genes$position_2[i]])
+        pull_sequence <- as.character(paste(which_contig[[1]][dist_between_genes$position_1[i]:dist_between_genes$position_2[i]], collapse = ""))
+        seq_between_genes[i,8] <- as.character(pull_sequence)
       }
     }
     
     
     # rank seq_between_genes and subsequently dist_between_genes by gc-content
     cat("Ranking sites by GC content...\n")
-    seq_between_genes <- seq_between_genes[order(seq_between_genes$overall.gc.content),]
-    dist_between_genes <- dist_between_genes[match(seq_between_genes$gene.1, dist_between_genes$gene.1),]
+    seq_between_genes <- seq_between_genes[order(seq_between_genes$overall_gc_content),]
+    dist_between_genes <- dist_between_genes[match(seq_between_genes$gene_1, dist_between_genes$gene_1),]
     
     
     # remove sequences that con't have contig matches as they are located on plasmids (to be avoided)
@@ -459,11 +520,11 @@ permissR <- function(genbank_file_path, fasta_file_path){
     cat("Plotting data each site predicted...\n")
     # function to filter site data
     sites_filter_for_plotting <- function(data_in_to_filter, filter_info){
-      position_1 <- filter_info$position.1[1] - 1000
-      position_2 <- filter_info$position.2[1] + 1000
+      position_1 <- filter_info$position_1[1] - 1000
+      position_2 <- filter_info$position_2[1] + 1000
       data_in_to_filter <- subset(data_in_to_filter, contig == filter_info$contig[1])
-      data_in_to_filter <- subset(data_in_to_filter, end > filter_info$position.1[1] - 1000)
-      data_in_to_filter <- subset(data_in_to_filter, start < filter_info$position.2[1] + 1000)
+      data_in_to_filter <- subset(data_in_to_filter, end > filter_info$position_1[1] - 1000)
+      data_in_to_filter <- subset(data_in_to_filter, start < filter_info$position_2[1] + 1000)
       
       return(data_in_to_filter)
     }
@@ -472,16 +533,15 @@ permissR <- function(genbank_file_path, fasta_file_path){
   
     # ctreate a list of all subplots then plot them together
     list_of_plots <- list()
-    if (var1_IS == FALSE){
       for (i in 1:nrow(dist_between_genes)){
         scale_plot <- sites_filter_for_plotting(gc_content_whole_genome, dist_between_genes[i,]) 
         
         # annotation plot
         plot1 <- .annotation_plot(scale_plot, 
                                  sites_filter_for_plotting(anno_file_reformate, dist_between_genes[i,])) +
-          coord_cartesian(xlim = c(dist_between_genes$position.1[i] - 1000, dist_between_genes$position.2[i] + 1000)) +
-          annotate("text", x = c(dist_between_genes$position.1[i], dist_between_genes$position.2[i]), y = 0.51, 
-                   label = c(dist_between_genes$gene.1[i], dist_between_genes$gene.2[i])) +
+          coord_cartesian(xlim = c(dist_between_genes$position_1[i] - 1000, dist_between_genes$position_2[i] + 1000)) +
+          annotate("text", x = c(dist_between_genes$position_1[i], dist_between_genes$position_2[i]), y = 0.51, 
+                   label = c(dist_between_genes$gene_1[i], dist_between_genes$gene_2[i])) +
           expand_limits(y = 0.52) + 
           xlab("")
         
@@ -489,86 +549,31 @@ permissR <- function(genbank_file_path, fasta_file_path){
         # shannon entropy plot
         plot2 <- .shannon_entropy_plot(scale_plot, 
                                       sites_filter_for_plotting(shannon_entropy_whole_genome, dist_between_genes[i,]))  +
-          coord_cartesian(xlim = c(dist_between_genes$position.1[i] - 1000, dist_between_genes$position.2[i] + 1000))
+        coord_cartesian(xlim = c(dist_between_genes$position_1[i] - 1000, dist_between_genes$position_2[i] + 1000))
         
         
         # gc content plot
         plot3 <- .gc_content_plot(scale_plot, 
-                                 sites_filter_for_plotting(gc_content_whole_genome, dist_between_genes[i,]), 
-                                 dist_between_genes[i,]) + theme(strip.text.x = element_text(angle = 360)) +
-          coord_cartesian(xlim = c(dist_between_genes$position.1[i] - 1000, dist_between_genes$position.2[i] + 1000))
+                               sites_filter_for_plotting(gc_content_whole_genome, dist_between_genes[i,]), 
+                               dist_between_genes[i,]) + theme(strip.text.x = element_text(angle = 360)) +
+        coord_cartesian(xlim = c(dist_between_genes$position_1[i] - 1000, dist_between_genes$position_2[i] + 1000))
         
         
-        list_of_plots[[i]] <- patchwork::wrap_plots(list(plot1,plot2,plot3), ncol = 1, nrow = 3, heights = c(0.4,0.8,0.8))
-      }
-      
-      #determine length of the page to plot the subplots onto
-      subplots <- patchwork::wrap_plots(list_of_plots, ncol = 2)
-    
-      length_of_page <- length(subplots$patches$plots)
-      if(length_of_page == 1){
-        length_of_page <- length_of_page*4.25
-      }
-      if(length_of_page > 1){
-        length_of_page <- (length_of_page/2)*4.25
-      }
+      list_of_plots[[i]] <- patchwork::wrap_plots(list(plot1,plot2,plot3), ncol = 1, nrow = 3, heights = c(0.4,0.8,0.8))
     }
-  
-    if (var1_IS == TRUE){
-      for (i in 1:nrow(dist_between_genes)){
-        scale_plot <- sites_filter_for_plotting(gc_content_whole_genome, dist_between_genes[i,]) 
-        
-        # annotation plot
-        plot1 <- .annotation_plot(scale_plot, 
-                                 sites_filter_for_plotting(anno_file_reformate, dist_between_genes[i,])) +
-          coord_cartesian(xlim = c(dist_between_genes$position.1[i] - 1000, dist_between_genes$position.2[i] + 1000)) +
-          annotate("text", x = c(dist_between_genes$position.1[i], dist_between_genes$position.2[i]), 
-                   y = 0.6, 
-                   size = 2.5,
-                   label = c(dist_between_genes$gene.1[i], dist_between_genes$gene.2[i]), 
-                   hjust = 0, 
-                   angle = 45) +
-          expand_limits(y = 2) +
-          xlab("") +
-          theme(plot.margin = unit(c(0.4,0.2,-0.7,0.2), "cm"))
-        
-        
-        # is element plot
-        
-        plot2 <- .mobile_element_plot(scale_plot, 
-                                 sites_filter_for_plotting(IS_elements_reform, dist_between_genes[i,])) +
-          coord_cartesian(xlim = c(dist_between_genes$position.1[i] - 1000, dist_between_genes$position.2[i] + 1000)) 
-  
-              
-        # shannon entropy plot
-        plot3 <- .shannon_entropy_plot(scale_plot, 
-                                      sites_filter_for_plotting(shannon_entropy_whole_genome, dist_between_genes[i,]))  +
-          coord_cartesian(xlim = c(dist_between_genes$position.1[i] - 1000, dist_between_genes$position.2[i] + 1000)) 
-        
-        
-        # gc content plot
-        plot4 <- .gc_content_plot(scale_plot, 
-                                 sites_filter_for_plotting(gc_content_whole_genome, dist_between_genes[i,]), 
-                                 dist_between_genes[i,]) + theme(strip.text.x = element_text(angle = 360)) +
-          coord_cartesian(xlim = c(dist_between_genes$position.1[i] - 1000, dist_between_genes$position.2[i] + 1000)) +
-          theme(strip.text = element_text(size = 6))
-        
-        
-        list_of_plots[[i]] <- patchwork::wrap_plots(list(plot1, plot2, plot3, plot4), ncol = 1, nrow = 4, heights = c(0.4, 0.4, 0.4, 0.4)) 
-      }
       
-      #determine length of the page to plot the subplots onto
-      #subplots <- patchwork::wrap_plots(list_of_plots, ncol = 3)
-      
-      #length_of_page <- length(subplots$patches$plots)
-      #if((length_of_page%%2) == 1){
-      #  length_of_page <- length_of_page*6
-      #}
-      #if((length_of_page%%2) == 0){
-      #  length_of_page <- (length_of_page/2)*6
-      #}
-    }
+    #determine length of the page to plot the subplots onto
+    #subplots <- patchwork::wrap_plots(list_of_plots, ncol = 2)
     
+    #length_of_page <- length(subplots$patches$plots)
+    #if(length_of_page == 1){
+    #  length_of_page <- length_of_page*4.25
+    #}
+    #if(length_of_page > 1){
+    #  length_of_page <- (length_of_page/2)*4.25
+    #}
+  
+
     for (i in 1:length(list_of_plots)){
       subplots_file_name <- paste(strain_name,"subplot",i,".pdf", sep = "_")
       

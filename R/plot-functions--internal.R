@@ -28,6 +28,7 @@
               aes(xmin = start, xmax = end, ymin = 0, ymax = 0.5, fill = factor(contig)), 
               stat = "identity", fill = "white") + 
     
+    
     geom_rect(data = data_to_plot,  
               aes(xmin = start, xmax = end, ymin = 0, ymax = 0.5, fill = factor(contig)), 
               stat = "identity", fill = "grey35") +
@@ -51,6 +52,45 @@
   return(plot)
 }
 
+
+
+# function for plotting annotations
+#.annotation_subplot <- function(data_to_set_up_scale, data_to_plot) {
+  
+#  plot <-
+    
+    #geom_rect(data = data_to_set_up_scale, 
+    #          aes(xmin = start, xmax = end, ymin = 0, ymax = 0.5, fill = factor(contig)), 
+    #          stat = "identity", fill = "white") + 
+    
+    
+  
+    #ggplot(data_to_plot, 
+    #       aes(xmin = start, xmax = end, label = gene, fill = gene, y = contig, forward = strand)) + 
+    #  geom_gene_arrow(arrowhead_height = grid::unit(6, "mm"), 
+    #                  arrowhead_width = unit(2, "mm"),
+    #                  arrow_body_height = grid::unit(6, "mm")) + 
+  #ggfittext::geom_fit_text(min.size = 4, place = "center", vjust = 1)
+
+    
+#    theme_classic() +
+#    scale_y_continuous(expand = c(0, 0)) +
+#    scale_x_continuous(expand = c(0, 0)) +
+#    theme(legend.position = "none", axis.text.y.left = element_blank(), 
+#          axis.ticks.y.left = element_blank(),
+#          axis.title.y.left = element_text(angle = 360),
+#          strip.background = element_blank(),
+#          strip.text.x = element_blank(),
+#          strip.placement = "outside",
+#          axis.text.x = element_blank()) +
+#    facet_grid(. ~ factor(contig, 
+#                          levels = unique(forcats::fct_inorder(forcats::fct_drop(contigs_file_reformate$contig)))), 
+#               scales = 'free_x', space = 'free_x', switch = 'x') + 
+#    ylab("Genes\nPresent") 
+  
+  
+#  return(plot)
+#}
 
 
 # function for mobile element annotations
@@ -154,7 +194,7 @@
               stat = "identity", size = 0.3, color = "black") + 
     
     geom_rect(data = sites_to_plot,  
-              aes(xmin = position.1, xmax = position.2, ymin = 0, ymax = 1, fill = factor(contig)), 
+              aes(xmin = position_1, xmax = position_2, ymin = 0, ymax = 1, fill = factor(contig)), 
               stat = "identity", fill = "#0072B2", alpha = 0.8) +
     
     facet_grid(. ~ factor(contig, 
