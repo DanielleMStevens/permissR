@@ -40,7 +40,7 @@
   if (var1_IS == "y"){
     var1_IS <<- TRUE
     cat("Select .fasta.out file from ISEScan Output\n")
-    is_element_file <- file.choose()
+    is_element_file <<- file.choose()
   }
   if (var1_IS == "n"){
     var1_IS <<- FALSE

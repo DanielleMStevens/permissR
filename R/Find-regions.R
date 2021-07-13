@@ -15,7 +15,9 @@
 #' encoded information to clone into pSelAct-Express for integrative expression.
 #' 
 #'
-#' @param infile Path to the input file
+#' @param genbank_file_path takes in path of genbank file
+#' @param fasta_file_path takes in path of fasta file
+#' 
 #' @return Plots and files of potential permissive sites in a provided bacterial genome
 #' @export
 #' 
@@ -25,6 +27,7 @@ permissR <- function(genbank_file_path, fasta_file_path){
 ######################################################################
 # ascii art for running script
 ######################################################################
+  strain_name <- NULL
   
   permissR <- r"{
 
@@ -44,6 +47,8 @@ permissR <- function(genbank_file_path, fasta_file_path){
   ######################################################################
   # import files to process
   ######################################################################
+  
+      
   
   # run internal function to load inital files if path is not given
   
@@ -113,17 +118,18 @@ permissR <- function(genbank_file_path, fasta_file_path){
     # determine type of genbank file (.gbff vs .gbk)
     cat("Reformating Genbank File....\n")
     
-    anno_file_reformate <- data.frame("gene" = character(0), "locus-tag" = character(0), 
-                                       'type' = character(0), 'strand' = character(0), 
-                                       'start' = numeric(0), 'end' = numeric(0))
-    
-    
+    anno_file_reformate <- data.frame("gene" = character(0), 
+                                      "locus-tag" = character(0), 
+                                      "type" = character(0), 
+                                      "strand" = character(0), 
+                                      "start" = numeric(0), 
+                                      "end" = numeric(0))
     
     
     
     reformate_genbank <- function(file_in){
       for (i in 1:nrow(file_in$FEATURES)){
-      
+        
         
         # skip empty annotations 
         if(length(file_in$FEATURES[[i]]) == 0){
@@ -135,7 +141,7 @@ permissR <- function(genbank_file_path, fasta_file_path){
           if(any(grepl("organism", colnames(file_in$FEATURES[[i]]))) == TRUE){
             next
           }
-
+          
           if(file_in$FEATURES[[i]]$type == "CDS"){
             gene_name <- file_in$FEATURES[[i]]$locus_tag
             locus_tag <- file_in$FEATURES[[i]]$locus_tag
@@ -149,7 +155,7 @@ permissR <- function(genbank_file_path, fasta_file_path){
             locus_tag <- file_in$FEATURES[[i]]$db_xref
           }
         }
-
+        
         
         temp_df <- data.frame("gene" = gene_name, 
                               "locus-tag" = locus_tag,
@@ -158,9 +164,9 @@ permissR <- function(genbank_file_path, fasta_file_path){
                               'start' = file_in$FEATURES[[i]]$start,
                               'end' = file_in$FEATURES[[i]]$end)
         
-        #print(paste(i,temp_df))  
+        print(paste(i,temp_df))  
         anno_file_reformate <- rbind(anno_file_reformate, temp_df)
-  
+        
       }
       
       anno_file_reformate <- anno_file_reformate %>% dplyr::distinct(gene, start, end, .keep_all = TRUE)
@@ -170,11 +176,6 @@ permissR <- function(genbank_file_path, fasta_file_path){
     
     
     anno_file_reformate <- reformate_genbank(annotation_file)
-
-
-
-    
-
 
     
   ######################################################################
@@ -310,11 +311,21 @@ permissR <- function(genbank_file_path, fasta_file_path){
       
       cat("Reformating IS Elements....\n")
       IS_elements_reform <- data.frame("contig" = character(0), "start" = numeric(0), "end" = numeric(0))
-      for (i in 1:nrow(IS_elements)){
-        contig_number <- reference_names[reference_names$Original_name %in% IS_elements$seqID[i],2]
+      if (nrow(IS_elements) > 1){
+        for (i in 1:nrow(IS_elements)){
+          contig_number <- reference_names[reference_names$Original_name %in% IS_elements$seqID[i],2]
+          temp_df <- data.frame("contig" = contig_number,
+                                "start" = IS_elements$isBegin[i],
+                                "end" = IS_elements$isEnd[i])
+          IS_elements_reform <- rbind(IS_elements_reform, temp_df)
+        }
+      }
+      
+      if (nrow(IS_elements) == 1){
+        contig_number <- reference_names[reference_names$Original_name %in% IS_elements$seqID[1],2]
         temp_df <- data.frame("contig" = contig_number,
-                              "start" = IS_elements$isBegin[i],
-                              "end" = IS_elements$isEnd[i])
+                              "start" = IS_elements$isBegin[1],
+                              "end" = IS_elements$isEnd[1])
         IS_elements_reform <- rbind(IS_elements_reform, temp_df)
       }
     }
@@ -459,7 +470,7 @@ permissR <- function(genbank_file_path, fasta_file_path){
     contigs_file_reformate <- subset(contigs_file_reformate, contig == unique(gc_content_whole_genome$contig))
     
     #making sure all files match contig number
-    anno_file_reformate <- subset(anno_file_reformate, contig == contigs_file_reformate$contig)
+    anno_file_reformate <- anno_file_reformate[anno_file_reformate$contig %in% contigs_file_reformate$contig,]
     
     
   
@@ -472,10 +483,13 @@ permissR <- function(genbank_file_path, fasta_file_path){
     cat("Plotting data for the whole genome and exporting the figure...\n")
     
     if(var1_IS == FALSE){
-      whole_genome_plot <- suppressWarnings(patchwork::wrap_plots(list(
+      whole_genome_plot <- 
+  
+        suppressWarnings(patchwork::wrap_plots(list(
                                               .annotation_plot(contigs_file_reformate, anno_file_reformate) + 
                                                 ggtitle(strain_name) +
                                                 theme(plot.title = element_text(lineheight = 1.2, face = "bold", family = "Arial", size = 16)), 
+                                              
                                               .shannon_entropy_plot(contigs_file_reformate, shannon_entropy_whole_genome), 
                                               .gc_content_plot(contigs_file_reformate, gc_content_whole_genome, dist_between_genes)), 
                                               ncol = 1, nrow = 3, heights = c(0.4,0.8,0.8)))
@@ -484,9 +498,8 @@ permissR <- function(genbank_file_path, fasta_file_path){
       whole_genome_plot <- suppressWarnings(patchwork::wrap_plots(list(
                                               .annotation_plot(contigs_file_reformate, anno_file_reformate) +
                                                 ggtitle(strain_name) +
-                                                theme(text = element_text(size = 14),
-                                    
-                                                  plot.title = element_text(lineheight = 1.2, face = "bold", family = "Arial", size = 18)),
+                                                theme(text = element_text(size = 14), plot.title = element_text(lineheight = 1.2, face = "bold", family = "Arial", size = 18)),
+                                              
                                               .mobile_element_plot(contigs_file_reformate, IS_elements_reform) + 
                                                 theme(text = element_text(size = 14)),
                                               .shannon_entropy_plot(contigs_file_reformate, shannon_entropy_whole_genome) + 
@@ -499,7 +512,7 @@ permissR <- function(genbank_file_path, fasta_file_path){
     }
     
     
-    #print(whole_genome_plot)
+    print(whole_genome_plot)
     whole_genome_file_name <- paste(strain_name,"whole_genome_plot.pdf", sep = "_")
     
     
@@ -508,7 +521,8 @@ permissR <- function(genbank_file_path, fasta_file_path){
     output_directory <- paste(strain_name, "outputs", sep = "_")
     dir.create(file.path(main_path, output_directory))
     
-    ggsave(filename = file.path(output_directory, whole_genome_file_name), width = 14, height = 6, units = c("in"), device = cairo_pdf)
+    ggsave(filename = file.path(output_directory, whole_genome_file_name), 
+           width = 14, height = 6, units = c("in"), device = cairo_pdf)
   
     
   
@@ -523,8 +537,8 @@ permissR <- function(genbank_file_path, fasta_file_path){
       position_1 <- filter_info$position_1[1] - 1000
       position_2 <- filter_info$position_2[1] + 1000
       data_in_to_filter <- subset(data_in_to_filter, contig == filter_info$contig[1])
-      data_in_to_filter <- subset(data_in_to_filter, end > filter_info$position_1[1] - 1000)
-      data_in_to_filter <- subset(data_in_to_filter, start < filter_info$position_2[1] + 1000)
+      data_in_to_filter <- subset(data_in_to_filter, end > (filter_info$position_1[1] - 1000))
+      data_in_to_filter <- subset(data_in_to_filter, start < (filter_info$position_2[1] + 1000))
       
       return(data_in_to_filter)
     }
@@ -539,39 +553,36 @@ permissR <- function(genbank_file_path, fasta_file_path){
         # annotation plot
         plot1 <- .annotation_plot(scale_plot, 
                                  sites_filter_for_plotting(anno_file_reformate, dist_between_genes[i,])) +
-          coord_cartesian(xlim = c(dist_between_genes$position_1[i] - 1000, dist_between_genes$position_2[i] + 1000)) +
-          annotate("text", x = c(dist_between_genes$position_1[i], dist_between_genes$position_2[i]), y = 0.51, 
-                   label = c(dist_between_genes$gene_1[i], dist_between_genes$gene_2[i])) +
-          expand_limits(y = 0.52) + 
-          xlab("")
+                  coord_cartesian(xlim = c(dist_between_genes$position_1[i] - 1000, dist_between_genes$position_2[i] + 1000)) + 
+                  annotate("text", x = c(dist_between_genes$position_1[i], dist_between_genes$position_2[i]), 
+                           y = 0.6, 
+                           size = 2,
+                           label = c(dist_between_genes$gene_1[i], dist_between_genes$gene_2[i]), 
+                           hjust = 0, 
+                           angle = 45) +
+                  expand_limits(y = 2) +
+                  xlab("") +
+                  theme(plot.margin = unit(c(0.4,0.2,-0.7,0.2), "cm"))
         
         
         # shannon entropy plot
         plot2 <- .shannon_entropy_plot(scale_plot, 
-                                      sites_filter_for_plotting(shannon_entropy_whole_genome, dist_between_genes[i,]))  +
-        coord_cartesian(xlim = c(dist_between_genes$position_1[i] - 1000, dist_between_genes$position_2[i] + 1000))
+                                      sites_filter_for_plotting(shannon_entropy_whole_genome, dist_between_genes[i,])) +
+                  coord_cartesian(xlim = c(dist_between_genes$position_1[i] - 1000, dist_between_genes$position_2[i] + 1000))
         
         
         # gc content plot
         plot3 <- .gc_content_plot(scale_plot, 
                                sites_filter_for_plotting(gc_content_whole_genome, dist_between_genes[i,]), 
-                               dist_between_genes[i,]) + theme(strip.text.x = element_text(angle = 360)) +
-        coord_cartesian(xlim = c(dist_between_genes$position_1[i] - 1000, dist_between_genes$position_2[i] + 1000))
+                               dist_between_genes[i,]) + 
+                  theme(strip.text.x = element_text(angle = 360)) +
+                  coord_cartesian(xlim = c(dist_between_genes$position_1[i] - 1000, dist_between_genes$position_2[i] + 1000))
         
         
       list_of_plots[[i]] <- patchwork::wrap_plots(list(plot1,plot2,plot3), ncol = 1, nrow = 3, heights = c(0.4,0.8,0.8))
+
     }
       
-    #determine length of the page to plot the subplots onto
-    #subplots <- patchwork::wrap_plots(list_of_plots, ncol = 2)
-    
-    #length_of_page <- length(subplots$patches$plots)
-    #if(length_of_page == 1){
-    #  length_of_page <- length_of_page*4.25
-    #}
-    #if(length_of_page > 1){
-    #  length_of_page <- (length_of_page/2)*4.25
-    #}
   
 
     for (i in 1:length(list_of_plots)){

@@ -8,45 +8,44 @@
 #           plots for main hits as well as tab-delimited file output of major hit regions ranked by complexity
 #-----------------------------------------------------------------------------------------------
 #' 
+#' @param data_to_set_up_scale inputs data that helps set the scale of the plot
+#' @param data_to_plot the data we are interested in actually plotting
 #' 
 #' 
-#' 
-#' @noRd
 #' @keywords internal
-
-######################################################################
-# functions for subsetiing and plotting data
-######################################################################
-
-
-# function for plotting annotations
-.annotation_plot <- function(data_to_set_up_scale, data_to_plot) {
+#' @noRd
+annotation_plot <- function(data_to_set_up_scale, data_to_plot) {
   
-  plot <- ggplot() +
+  ######################################################################
+  # functions for subsetiing and plotting data
+  ######################################################################
+  
+  plot <- ggplot2::ggplot() +
     
-    geom_rect(data = data_to_set_up_scale, 
+    ggplot2::geom_rect(data = data_to_set_up_scale, 
               aes(xmin = start, xmax = end, ymin = 0, ymax = 0.5, fill = factor(contig)), 
               stat = "identity", fill = "white") + 
     
-    
-    geom_rect(data = data_to_plot,  
+    ggplot2::geom_rect(data = data_to_plot,  
               aes(xmin = start, xmax = end, ymin = 0, ymax = 0.5, fill = factor(contig)), 
               stat = "identity", fill = "grey35") +
     
-    theme_classic() +
-    scale_y_continuous(expand = c(0, 0)) +
-    scale_x_continuous(expand = c(0, 0)) +
-    theme(legend.position = "none", axis.text.y.left = element_blank(), 
+    ggplot2::facet_grid(. ~ factor(contig, 
+                          levels = unique(forcats::fct_inorder(forcats::fct_drop(contigs_file_reformate$contig)))), 
+               scales = 'free_x', space = 'free_x', switch = 'x') + 
+    
+    ggplot2::theme_classic() +
+    ggplot2::scale_y_continuous(expand = c(0, 0)) +
+    ggplot2::scale_x_continuous(expand = c(0, 0)) +
+    ggplot2::theme(legend.position = "none", axis.text.y.left = element_blank(), 
           axis.ticks.y.left = element_blank(),
           axis.title.y.left = element_text(angle = 360),
           strip.background = element_blank(),
           strip.text.x = element_blank(),
           strip.placement = "outside",
           axis.text.x = element_blank()) +
-    facet_grid(. ~ factor(contig, 
-                          levels = unique(forcats::fct_inorder(forcats::fct_drop(contigs_file_reformate$contig)))), 
-               scales = 'free_x', space = 'free_x', switch = 'x') + 
-    ylab("Genes\nPresent") 
+
+    ggplot2::ylab("Genes\nPresent") 
   
   
   return(plot)
@@ -54,48 +53,12 @@
 
 
 
-# function for plotting annotations
-#.annotation_subplot <- function(data_to_set_up_scale, data_to_plot) {
-  
-#  plot <-
-    
-    #geom_rect(data = data_to_set_up_scale, 
-    #          aes(xmin = start, xmax = end, ymin = 0, ymax = 0.5, fill = factor(contig)), 
-    #          stat = "identity", fill = "white") + 
-    
-    
-  
-    #ggplot(data_to_plot, 
-    #       aes(xmin = start, xmax = end, label = gene, fill = gene, y = contig, forward = strand)) + 
-    #  geom_gene_arrow(arrowhead_height = grid::unit(6, "mm"), 
-    #                  arrowhead_width = unit(2, "mm"),
-    #                  arrow_body_height = grid::unit(6, "mm")) + 
-  #ggfittext::geom_fit_text(min.size = 4, place = "center", vjust = 1)
-
-    
-#    theme_classic() +
-#    scale_y_continuous(expand = c(0, 0)) +
-#    scale_x_continuous(expand = c(0, 0)) +
-#    theme(legend.position = "none", axis.text.y.left = element_blank(), 
-#          axis.ticks.y.left = element_blank(),
-#          axis.title.y.left = element_text(angle = 360),
-#          strip.background = element_blank(),
-#          strip.text.x = element_blank(),
-#          strip.placement = "outside",
-#          axis.text.x = element_blank()) +
-#    facet_grid(. ~ factor(contig, 
-#                          levels = unique(forcats::fct_inorder(forcats::fct_drop(contigs_file_reformate$contig)))), 
-#               scales = 'free_x', space = 'free_x', switch = 'x') + 
-#    ylab("Genes\nPresent") 
-  
-  
-#  return(plot)
-#}
-
 
 # function for mobile element annotations
 .mobile_element_plot <- function(data_to_set_up_scale, data_to_plot){
   
+  
+  # if there are IS elements present
   if (nrow(data_to_plot) > 0){
     plot <- ggplot() +
       geom_rect(data = data_to_set_up_scale, 
@@ -118,17 +81,20 @@
             strip.placement = "outside") +
       facet_grid(~factor(contig, 
                          levels = unique(forcats::fct_inorder(forcats::fct_drop(contigs_file_reformate$contig)))), 
-                 scales = 'free_x', space = 'free_x', switch = 'x') + 
+                          scales = 'free_x', space = 'free_x', switch = 'x') + 
       ylab("IS Elements\nPresent")
   }
+  
+  # if there are no IS elements present
   if (nrow(data_to_plot) == 0){
     plot <- ggplot() +
       geom_rect(data = data_to_set_up_scale, 
                 aes(xmin = start, xmax = end, ymin = 0, ymax = 0.5, fill = factor(contig)), 
                 stat = "identity", fill = "white") + 
-      geom_blank() +
       
+      geom_blank() +
       theme_classic() +
+      
       scale_y_continuous(expand = c(0, 0)) +
       scale_x_continuous(expand = c(0, 0)) +
       theme(legend.position = "none", axis.text.y.left = element_blank(), 
@@ -138,9 +104,11 @@
             strip.background = element_blank(),
             strip.text.x = element_blank(),
             strip.placement = "outside") +
+      
       facet_grid(~factor(contig, 
                          levels = unique(forcats::fct_inorder(forcats::fct_drop(contigs_file_reformate$contig)))), 
                  scales = 'free_x', space = 'free_x', switch = 'x') + 
+      
       ylab("IS Elements\nPresent")
   }
   
@@ -160,12 +128,16 @@
     geom_line(data = data_to_plot,
               aes(x = start, y = shannon.entropy, fill = factor(contig)), 
               stat = "identity", size = 0.3) +
+
     
-    facet_grid(. ~ factor(contig, 
-                          levels = unique(forcats::fct_inorder(forcats::fct_drop(contigs_file_reformate$contig)))), scales = 'free_x', space = 'free_x', switch = 'x') + 
     theme_classic() +
     scale_x_continuous(expand = c(0, 0)) +
     ylim(1.4,2.0) +
+    
+    facet_grid(. ~ factor(contig, 
+                          levels = unique(forcats::fct_inorder(forcats::fct_drop(contigs_file_reformate$contig)))), 
+               scales = 'free_x', space = 'free_x', switch = 'x') + 
+    
     theme(axis.text.x = element_blank(), 
           axis.title.x = element_blank(),
           axis.text.y = element_text(family = "Arial", size = 11, color = "black"),
@@ -179,14 +151,14 @@
 }
 
 
-#data_to_set_up_scale
+
 # function for plotting gc content with contig info
 .gc_content_plot <- function(data_to_set_up_scale, data_to_plot, sites_to_plot) {
   
   plot <- ggplot() +
     
     geom_rect(data = data_to_set_up_scale, 
-              aes(xmin = start, xmax = end, ymin = 0, ymax = 1),
+              aes(xmin = start, xmax = end, ymin = 0, ymax = 1, fill = factor(contig)),
               fill = "white") +
     
     geom_line(data = data_to_plot, 
@@ -197,11 +169,15 @@
               aes(xmin = position_1, xmax = position_2, ymin = 0, ymax = 1, fill = factor(contig)), 
               stat = "identity", fill = "#0072B2", alpha = 0.8) +
     
-    facet_grid(. ~ factor(contig, 
-                          levels = unique(forcats::fct_inorder(forcats::fct_drop(data_to_plot$contig)))), scales = 'free_x', space = 'free_x', switch = 'x') + 
+
     theme_classic() +
     scale_y_continuous(expand = c(0, 0), limits = c(0,1)) +
     scale_x_continuous(expand = c(0, 0)) +
+    
+    facet_grid(. ~ factor(contig, 
+                          levels = unique(forcats::fct_inorder(forcats::fct_drop(data_to_plot$contig)))), 
+                          scales = 'free_x', space = 'free_x', switch = 'x') + 
+    
     theme(axis.text.x = element_text(family = "Arial", size = 11, color = "black", 
                                      angle = 90), 
           axis.text.y = element_text(family = "Arial", size = 11, color = "black"),
@@ -213,6 +189,86 @@
           strip.placement = "outside") +
     ylab("%GC") +
     xlab("\nPosition along Chromosome") 
+  
+  return(plot)
+}
+
+
+
+
+
+
+
+
+# function for plotting annotations
+.annotation_subplot <- function(data_to_set_up_scale, data_to_plot) {
+  
+  data_to_set_up_scale <- data_to_set_up_scale[c(1,nrow(data_to_set_up_scale)),]
+  data_to_set_up_scale <- data.frame(data_to_set_up_scale[1,1:2],data_to_set_up_scale[2,3])
+  colnames(data_to_set_up_scale) <- c("contig","position_start","position_end")
+  print(data_to_set_up_scale)
+  
+  data_to_plot <- cbind(data_to_plot, rep(data_to_set_up_scale[,2:3],1))
+  data_to_plot[data_to_plot == "-"] <- -1
+  data_to_plot[data_to_plot == "+"] <- +1
+  
+  print(data_to_plot)
+  
+  plot <- data_to_plot %>%
+    ggplot(aes(xmin = start, xmax = end, y = contig)) +
+    geom_linerange(data = data_to_set_up_scale, aes(xmin = position_start,, xmax = position_end),
+                   color = "black") +
+    geom_gene_arrow(aes(forward = strand),
+                    fill = "grey", color = "black",
+                    arrowhead_height = grid::unit(6, "mm"), 
+                    arrowhead_width = unit(2, "mm"),
+                    arrow_body_height = grid::unit(6, "mm")) +
+    theme_genes()  +
+    theme(axis.title.y = element_blank(),
+          axis.line.x = element_blank(),
+          #axis.ticks.x = element_blank(),
+          #axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          legend.position = "none") +
+    ggrepel::geom_text_repel(data = data_to_plot %>% mutate(start = (start + end)/2), aes(x = start, y = contig, label = gene), 
+                             inherit.aes = F, nudge_y = 1)
+  #facet_grid(. ~ factor(contig, levels = unique(forcats::fct_inorder(forcats::fct_drop(contigs_file_reformate$contig)))), scales = 'free_x', space = 'free_x', switch = 'x')
+  
+  #plot <- ggplot(data = data_to_plot, 
+  #               aes(xmin = start, xmax = end, label = gene, fill = gene, y = contig, forward = strand)) + 
+  #  
+  #
+  #  geom_linerange(data = data_to_set_up_scale, aes(xmin = position_start,, xmax = position_end)) +
+  #  geom_gene_arrow() + 
+  #scale_y_discrete(limits = )
+  
+  #  theme_genes() +
+  #  theme(legend.position = "none", 
+  #        axis.title.y = element_blank(), 
+  #        axis.text.x = element_text(color = "black"), 
+  #        
+  #ggfittext::geom_fit_text(min.size = 4, place = "center", vjust = 1)
+  
+  
+  
+  #geom_rect(data = data_to_set_up_scale, 
+  #          aes(xmin = start, xmax = end, ymin = 0, ymax = 0.5, fill = factor(contig)), 
+  #          stat = "identity", fill = "white") + 
+  
+  
+  
+  #    scale_y_continuous(expand = c(0, 0)) +
+  #    scale_x_continuous(expand = c(0, 0)) +
+  #    theme(legend.position = "none", axis.text.y.left = element_blank(), 
+  #          axis.ticks.y.left = element_blank(),
+  #          axis.title.y.left = element_text(angle = 360),
+  #          strip.background = element_blank(),
+  #          strip.text.x = element_blank(),
+  #          strip.placement = "outside",
+  #          axis.text.x = element_blank()) +
+  #     + 
+  #    
+  
   
   return(plot)
 }
