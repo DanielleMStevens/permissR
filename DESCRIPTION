@@ -23,7 +23,7 @@ Imports:
 	utils (>= 3.6.2),
 	dplyr (>= 1.0.6),
 	forcats,
-	ggrepel,
+	parallel,
 	extrafont,
 	devtools
 LazyData: true

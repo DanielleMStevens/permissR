@@ -19,8 +19,6 @@
 
 .MBE_files <- function(){
   
-  library(parallel)
-  
   check_IS_Scan <- readline(prompt = "Do you need to run ISEScan? (y/n): ")
   
   if (check_IS_Scan == "y"){
@@ -35,7 +33,7 @@
   
   
   
-  
+  var1_IS <- NULL
   var1_IS <- readline(prompt = "Is there an output from ISEScan? (y/n): ")
   if (var1_IS == "y"){
     var1_IS <<- TRUE
