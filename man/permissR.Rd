@@ -7,7 +7,9 @@
 permissR(genbank_file_path, fasta_file_path)
 }
 \arguments{
-\item{infile}{Path to the input file}
+\item{genbank_file_path}{takes in path of genbank file}
+
+\item{fasta_file_path}{takes in path of fasta file}
 }
 \value{
 Plots and files of potential permissive sites in a provided bacterial genome

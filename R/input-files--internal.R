@@ -6,12 +6,8 @@
 # Inputs: fasta file, genbank file, iSEScan output
 # Outputs: N/A
 #-----------------------------------------------------------------------------------------------
-#' Using GUI to load inital files if path is not provided by user
-#' 
-#' 
-#' 
-#' @noRd
-#' @keywords internal
+# Using GUI to load inital files if path is not provided by user
+
 
 ######################################################################
 # load initial files to start script
