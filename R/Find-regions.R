@@ -14,9 +14,6 @@
 #' (gbff/gbk) to search for regions a minimum 1.5 kB in size which carry no
 #' encoded information to clone into pSelAct-Express for integrative expression.
 #' 
-#' @importFrom grDevices cairo_pdf
-#' @importFrom utils write.table
-#' 
 #'
 #' @param genbank_file_path takes in path of genbank file
 #' @param fasta_file_path takes in path of fasta file
@@ -347,7 +344,10 @@ permissR <- function(genbank_file_path, fasta_file_path){
   # run fasta file against iscan elements script
   ######################################################################
     
+    #IS_start_position_list <- list()
+    #IS_end_position_list <- list()
     
+    #remove_is_element_hits <- function(data_table_in, )
     
     
   
@@ -410,7 +410,7 @@ permissR <- function(genbank_file_path, fasta_file_path){
     for (j in 1:nrow(seq_between_genes)){  
       for (i in 1:length(whole_genome)){
         output <- Biostrings::vmatchPattern(seq_between_genes[j,8], paste(whole_genome[[i]][1:length(whole_genome[[i]])], collapse = ""), 
-                                  max.mismatch = (nchar(seq_between_genes[j,8])*0.5))
+                                  max.mismatch = (nchar(seq_between_genes[j,8])*0.2))
   
         output <- as.data.frame(unlist(output))
         if(nrow(output) > 0){
