@@ -2,13 +2,15 @@
 
 # permissR - an R Package for finding Bacterial Permissive Sites
 
-Danielle M. Stevens<sup>1,2</sup> and Gitta Coaker<sup>1</sup>.
+* __Danielle M. Stevens__ <a itemprop="sameAs" content="https://orcid.org/0000-0001-5630-137X" href="https://orcid.org/0000-0001-5630-137X" target="orcid.widget" rel="me noopener noreferrer" style="vertical-align:top;"><img src="https://orcid.org/sites/default/files/images/orcid_16x16.png" style="width:1em;margin-right:.5em;" alt="ORCID iD icon"></a>   </br>
+_Dept. of Plant Pathology, University of California, Davis_, </br>
+_Integrative Genetics and Genomics Graduate Group, University of California, Davis_
 
-<sup>1</sup>Department of Plant Pathology, University of California, Davis, USA <br />
-<sup>2</sup>Integrative Genetics and Genomics Graduate Program, University of California, Davis, USA <br />
+* __Gitta Coaker__ <a itemprop="sameAs" content="https://orcid.org/0000-0003-0899-2449" href="https://orcid.org/0000-0003-0899-2449" target="orcid.widget" rel="me noopener noreferrer" style="vertical-align:top;"><img src="https://orcid.org/sites/default/files/images/orcid_16x16.png" style="width:1em;margin-right:.5em;" alt="ORCID iD icon"></a> </br>
+_Dept. of Plant Pathology, University of California, Davis_
 
 ---
-permissR is an R script for finding permissive sites, i.e. sites which appear to contain no functionally encoded information, proteins, regulatory regions, and mobile elements.
+__permissR__ is an R script for finding permissive sites, i.e. sites which appear to contain no functionally encoded information, proteins, regulatory regions, and mobile elements.
 
 This package works intandom with pSelAct Express, a vector modified for gene expression in the chromosome of a permissive site. Therefore, the decisions to find such sites are ranked for this purpose.
 
