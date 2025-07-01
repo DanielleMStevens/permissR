@@ -1,4 +1,5 @@
 <img align="right" width="140" height="150" src="https://github.com/DanielleMStevens/permissR/blob/main/github_images/permissR_logo.png">
+
 # permissR - an R Package for finding Bacterial Permissive Sites
 
 Danielle M. Stevens<sup>1,2</sup> and Gitta Coaker<sup>1</sup>.
